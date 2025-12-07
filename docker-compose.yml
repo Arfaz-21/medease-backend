@@ -1,0 +1,46 @@
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: medease
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/medease
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: devsecret
+      FRONTEND_ORIGINS: http://localhost:5173,https://incandescent-piroshki-c2e1f0.netlify.app
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+
+  worker:
+    build: .
+    command: npm run worker
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/medease
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: devsecret
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  db-data:

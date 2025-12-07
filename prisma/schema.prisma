@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  email      String?  @unique
+  password   String?
+  name       String?
+  role       Role     @default(CAREGIVER)
+  createdAt  DateTime @default(now())
+  patients   Patient[] @relation("caregiverPatients")
+}
+
+model Patient {
+  id          String      @id @default(uuid())
+  name        String
+  timezone    String      @default("UTC")
+  caregiverId String?
+  caregiver   User?       @relation("caregiverPatients", fields: [caregiverId], references: [id])
+  devices     Device[]
+  medications Medication[]
+  schedules   Schedule[]
+  doseRecords DoseRecord[]
+  createdAt   DateTime    @default(now())
+}
+
+model Device {
+  id        String   @id @default(uuid())
+  patient   Patient  @relation(fields: [patientId], references: [id])
+  patientId String
+  name      String?
+  token     String?
+  lastSeen  DateTime?
+}
+
+model Medication {
+  id         String    @id @default(uuid())
+  patient    Patient   @relation(fields: [patientId], references: [id])
+  patientId  String
+  name       String
+  dosage     String?
+  icon       String?
+  notes      String?
+  createdAt  DateTime  @default(now())
+
+  schedules  Schedule[]
+}
+
+model Schedule {
+  id           String    @id @default(uuid())
+  patient      Patient   @relation(fields: [patientId], references: [id])
+  patientId    String
+  medication   Medication @relation(fields: [medicationId], references: [id])
+  medicationId String
+  timeOfDay    String
+  recurrence   String
+  windowMins   Int       @default(30)
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+
+  doseRecords  DoseRecord[]
+
+  @@index([patientId])
+}
+
+model DoseRecord {
+  id           String     @id @default(uuid())
+  schedule     Schedule   @relation(fields: [scheduleId], references: [id])
+  scheduleId   String
+
+  // the missing relation to Patient (required because Patient.doseRecords exists)
+  patient      Patient    @relation(fields: [patientId], references: [id])
+  patientId    String
+
+  scheduledAt  DateTime
+  status       DoseStatus @default(PENDING)
+  confirmedAt  DateTime?
+  confirmedBy  String?
+  createdAt    DateTime   @default(now())
+
+  @@unique([scheduleId, scheduledAt])
+  @@index([scheduledAt])
+}
+
+enum Role {
+  CAREGIVER
+  PATIENT_DEVICE
+}
+
+enum DoseStatus {
+  PENDING
+  TAKEN
+  MISSED
+}

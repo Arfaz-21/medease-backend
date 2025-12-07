@@ -1,0 +1,48 @@
+{
+  "name": "medease-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start:dev": "nest start --watch",
+    "start": "node dist/main.js",
+    "build": "nest build",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "seed": "ts-node scripts/seed.ts",
+    "worker": "node dist/workers/reminder.worker.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/jwt": "^10.0.0",
+    "@nestjs/platform-express": "^10.0.0",
+    "@prisma/client": "^5.0.0",
+    "bcrypt": "^5.1.0",
+    "bullmq": "^2.2.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "data-uri-to-buffer": "^6.0.2",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.0",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^6.0.1",
+    "ioredis": "^5.3.1",
+    "luxon": "^3.7.2",
+    "node-fetch": "^3.3.2",
+    "prisma": "^5.0.0",
+    "reflect-metadata": "^0.1.13",
+    "rrule": "^2.8.1",
+    "rxjs": "^7.8.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.0.0",
+    "@nestjs/schematics": "^10.0.0",
+    "@nestjs/testing": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.1.6"
+  }
+}
